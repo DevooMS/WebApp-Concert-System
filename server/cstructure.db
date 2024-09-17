@@ -1,0 +1,314 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Users" (
+	"user_id"	INTEGER,
+	"username"	TEXT NOT NULL UNIQUE,
+	"hash"	TEXT NOT NULL,
+	"salt"	TEXT NOT NULL,
+	"is_loyal_customer"	BOOLEAN DEFAULT 0,
+	PRIMARY KEY("user_id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "Theaters" (
+	"theater_id"	INTEGER,
+	"name"	TEXT NOT NULL,
+	"rows"	INTEGER NOT NULL,
+	"seats_per_row"	INTEGER NOT NULL,
+	PRIMARY KEY("theater_id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "Concerts" (
+	"concert_id"	INTEGER,
+	"name"	TEXT NOT NULL,
+	"theater_id"	INTEGER NOT NULL,
+	PRIMARY KEY("concert_id" AUTOINCREMENT),
+	FOREIGN KEY("theater_id") REFERENCES "Theaters"("theater_id")
+);
+CREATE TABLE IF NOT EXISTS "Seats" (
+	"seat_id"	INTEGER,
+	"theater_id"	INTEGER NOT NULL,
+	"row_number"	INTEGER NOT NULL,
+	"seat_position"	TEXT NOT NULL,
+	UNIQUE("theater_id","row_number","seat_position"),
+	PRIMARY KEY("seat_id" AUTOINCREMENT),
+	FOREIGN KEY("theater_id") REFERENCES "Theaters"("theater_id")
+);
+CREATE TABLE IF NOT EXISTS "ConcertSeats" (
+	"concert_seat_id"	INTEGER,
+	"concert_id"	INTEGER NOT NULL,
+	"seat_id"	INTEGER NOT NULL,
+	"status"	TEXT DEFAULT 'available',
+	UNIQUE("concert_id","seat_id"),
+	PRIMARY KEY("concert_seat_id" AUTOINCREMENT),
+	FOREIGN KEY("concert_id") REFERENCES "Concerts"("concert_id"),
+	FOREIGN KEY("seat_id") REFERENCES "Seats"("seat_id")
+);
+CREATE TABLE IF NOT EXISTS "Reservations" (
+	"reservation_id"	INTEGER,
+	"user_id"	INTEGER NOT NULL,
+	"concert_id"	INTEGER NOT NULL,
+	"reserved_at"	DATETIME DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE("user_id","concert_id"),
+	PRIMARY KEY("reservation_id" AUTOINCREMENT),
+	FOREIGN KEY("concert_id") REFERENCES "Concerts"("concert_id"),
+	FOREIGN KEY("user_id") REFERENCES "Users"("user_id")
+);
+CREATE TABLE IF NOT EXISTS "ReservationSeat" (
+	"reservation_id"	INTEGER NOT NULL,
+	"concert_seat_id"	INTEGER NOT NULL,
+	PRIMARY KEY("reservation_id","concert_seat_id"),
+	FOREIGN KEY("concert_seat_id") REFERENCES "ConcertSeats"("concert_seat_id"),
+	FOREIGN KEY("reservation_id") REFERENCES "Reservations"("reservation_id")
+);
+INSERT INTO "Users" ("user_id","username","hash","salt","is_loyal_customer") VALUES (1,'user1','15d3c4fca80fa608dcedeb65ac10eff78d20c88800d016369a3d2963742ea288','72e4eeb14def3b21',0);
+INSERT INTO "Users" ("user_id","username","hash","salt","is_loyal_customer") VALUES (2,'user2','1d22239e62539d26ccdb1d114c0f27d8870f70d622f35de0ae2ad651840ee58a','a8b618c717683608',0);
+INSERT INTO "Users" ("user_id","username","hash","salt","is_loyal_customer") VALUES (3,'user3','92e62890260814ba6d4783d24f4ebfa7cd7f2b35ebb260b94576b0e20759f9c9','5c6d7e8f9a1b2c3',1);
+INSERT INTO "Users" ("user_id","username","hash","salt","is_loyal_customer") VALUES (4,'user4','367313e88471e114e6b42ab91407cf5345050294f7aab99b5ad4a2ac10aaada8','766d7e8f9a1b242',1);
+INSERT INTO "Users" ("user_id","username","hash","salt","is_loyal_customer") VALUES (5,'user5','bc3f322a334c39fa0ccc7b6b50614704aeb80daf08505a0fc8fad42b2e9a04dd','766d73229a1b242',0);
+INSERT INTO "Theaters" ("theater_id","name","rows","seats_per_row") VALUES (1,'Small',4,8);
+INSERT INTO "Theaters" ("theater_id","name","rows","seats_per_row") VALUES (2,'Medium',6,10);
+INSERT INTO "Theaters" ("theater_id","name","rows","seats_per_row") VALUES (3,'Large',9,14);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (1,'Concert A',1);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (2,'Concert B',2);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (3,'Concert C',3);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (4,'Concert D',1);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (5,'Concert E',2);
+INSERT INTO "Concerts" ("concert_id","name","theater_id") VALUES (6,'Concert F',3);
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (1,1,1,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (2,1,1,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (3,1,1,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (4,1,1,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (5,1,1,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (6,1,1,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (7,1,1,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (8,1,1,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (9,1,2,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (10,1,2,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (11,1,2,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (12,1,2,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (13,1,2,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (14,1,2,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (15,1,2,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (16,1,2,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (17,1,3,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (18,1,3,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (19,1,3,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (20,1,3,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (21,1,3,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (22,1,3,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (23,1,3,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (24,1,3,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (25,1,4,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (26,1,4,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (27,1,4,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (28,1,4,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (29,1,4,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (30,1,4,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (31,1,4,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (32,1,4,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (33,2,1,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (34,2,1,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (35,2,1,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (36,2,1,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (37,2,1,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (38,2,1,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (39,2,1,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (40,2,1,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (41,2,1,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (42,2,1,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (43,2,2,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (44,2,2,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (45,2,2,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (46,2,2,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (47,2,2,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (48,2,2,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (49,2,2,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (50,2,2,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (51,2,2,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (52,2,2,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (53,2,3,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (54,2,3,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (55,2,3,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (56,2,3,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (57,2,3,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (58,2,3,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (59,2,3,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (60,2,3,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (61,2,3,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (62,2,3,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (63,2,4,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (64,2,4,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (65,2,4,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (66,2,4,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (67,2,4,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (68,2,4,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (69,2,4,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (70,2,4,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (71,2,4,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (72,2,4,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (73,2,5,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (74,2,5,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (75,2,5,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (76,2,5,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (77,2,5,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (78,2,5,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (79,2,5,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (80,2,5,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (81,2,5,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (82,2,5,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (83,2,6,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (84,2,6,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (85,2,6,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (86,2,6,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (87,2,6,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (88,2,6,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (89,2,6,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (90,2,6,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (91,2,6,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (92,2,6,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (93,3,1,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (94,3,1,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (95,3,1,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (96,3,1,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (97,3,1,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (98,3,1,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (99,3,1,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (100,3,1,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (101,3,1,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (102,3,1,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (103,3,1,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (104,3,1,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (105,3,1,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (106,3,1,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (107,3,2,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (108,3,2,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (109,3,2,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (110,3,2,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (111,3,2,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (112,3,2,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (113,3,2,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (114,3,2,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (115,3,2,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (116,3,2,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (117,3,2,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (118,3,2,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (119,3,2,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (120,3,2,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (121,3,3,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (122,3,3,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (123,3,3,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (124,3,3,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (125,3,3,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (126,3,3,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (127,3,3,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (128,3,3,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (129,3,3,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (130,3,3,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (131,3,3,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (132,3,3,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (133,3,3,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (134,3,3,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (135,3,4,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (136,3,4,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (137,3,4,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (138,3,4,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (139,3,4,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (140,3,4,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (141,3,4,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (142,3,4,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (143,3,4,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (144,3,4,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (145,3,4,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (146,3,4,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (147,3,4,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (148,3,4,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (149,3,5,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (150,3,5,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (151,3,5,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (152,3,5,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (153,3,5,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (154,3,5,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (155,3,5,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (156,3,5,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (157,3,5,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (158,3,5,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (159,3,5,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (160,3,5,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (161,3,5,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (162,3,5,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (163,3,6,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (164,3,6,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (165,3,6,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (166,3,6,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (167,3,6,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (168,3,6,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (169,3,6,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (170,3,6,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (171,3,6,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (172,3,6,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (173,3,6,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (174,3,6,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (175,3,6,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (176,3,6,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (177,3,7,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (178,3,7,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (179,3,7,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (180,3,7,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (181,3,7,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (182,3,7,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (183,3,7,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (184,3,7,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (185,3,7,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (186,3,7,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (187,3,7,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (188,3,7,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (189,3,7,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (190,3,7,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (191,3,8,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (192,3,8,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (193,3,8,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (194,3,8,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (195,3,8,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (196,3,8,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (197,3,8,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (198,3,8,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (199,3,8,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (200,3,8,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (201,3,8,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (202,3,8,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (203,3,8,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (204,3,8,'N');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (205,3,9,'A');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (206,3,9,'B');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (207,3,9,'C');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (208,3,9,'D');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (209,3,9,'E');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (210,3,9,'F');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (211,3,9,'G');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (212,3,9,'H');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (213,3,9,'I');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (214,3,9,'J');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (215,3,9,'K');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (216,3,9,'L');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (217,3,9,'M');
+INSERT INTO "Seats" ("seat_id","theater_id","row_number","seat_position") VALUES (218,3,9,'N');
+
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (7,2,1,'2024-09-11 19:44:31');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (8,2,3,'2024-09-11 19:45:09');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (9,1,1,'2024-09-11 19:45:34');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (10,1,2,'2024-09-11 19:45:47');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (11,3,4,'2024-09-11 19:46:08');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (12,1,5,'2024-09-11 19:49:32');
+INSERT INTO "Reservations" ("reservation_id","user_id","concert_id","reserved_at") VALUES (13,1,6,'2024-09-11 19:51:19');
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (7,1);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (7,2);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (7,3);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (8,93);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (8,94);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (8,97);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (8,95);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (8,96);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (9,10);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (9,11);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (9,9);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (10,43);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (10,45);
+INSERT INTO "ReservationSeat" ("reservation_id","concert_seat_id") VALUES (10,44);
+COMMIT;
